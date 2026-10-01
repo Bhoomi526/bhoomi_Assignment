@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Query, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.database import (
     create_item,
@@ -48,6 +48,10 @@ async def validation_exception_handler(
         },
     )
 
+
+@app.get("/")
+def frontend():
+    return FileResponse("frontend/index.html")
 
 @app.get("/health")
 def health_check():
