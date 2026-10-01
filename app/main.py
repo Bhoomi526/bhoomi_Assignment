@@ -54,7 +54,14 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.get("/api/v1/items")
+@app.get(
+    "/api/v1/items",
+    responses={
+        400: {
+            "description": "Invalid pagination parameters",
+        },
+    },
+)
 def list_items(
     limit: int = Query(default=10, ge=1, le=50),
     offset: int = Query(default=0, ge=0),
@@ -67,7 +74,14 @@ def list_items(
     }
 
 
-@app.get("/api/v1/items/{item_id}")
+@app.get(
+    "/api/v1/items/{item_id}",
+    responses={
+        404: {
+            "description": "Item not found",
+        }
+    },
+)
 def get_single_item(item_id: str):
     item = get_item(item_id)
 
@@ -89,7 +103,15 @@ def get_single_item(item_id: str):
     }
 
 
-@app.post("/api/v1/items", status_code=201)
+@app.post(
+    "/api/v1/items",
+    status_code=201,
+    responses={
+        400: {
+            "description": "Validation error",
+        }
+    },
+)
 def create_new_item(item: ItemCreate):
     item_id = str(uuid.uuid4())
 
@@ -103,7 +125,17 @@ def create_new_item(item: ItemCreate):
         "data": created_item,
     }
 
-@app.patch("/api/v1/items/{item_id}")
+@app.patch(
+    "/api/v1/items/{item_id}",
+    responses={
+        400: {
+            "description": "Validation error",
+        },
+        404: {
+            "description": "Item not found",
+        },
+    },
+)
 def update_existing_item(item_id: str, item: ItemUpdate):
     updates = item.model_dump(exclude_unset=True)
 
@@ -126,7 +158,15 @@ def update_existing_item(item_id: str, item: ItemUpdate):
         "data": updated_item,
     }
 
-@app.delete("/api/v1/items/{item_id}")
+@app.delete(
+    "/api/v1/items/{item_id}",
+    status_code=204,
+    responses={
+        404: {
+            "description": "Item not found",
+        },
+    },
+)
 def delete_existing_item(item_id: str):
     deleted = delete_item(item_id)
 
