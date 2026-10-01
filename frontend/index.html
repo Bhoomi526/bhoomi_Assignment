@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMPUT 401 Items</title>
+</head>
+<body>
+    <div data-testid="app-root">
+        <h1>CMPUT 401 Items</h1>
+
+        <button id="load-button" data-testid="load-button">
+            Load Items
+        </button>
+
+        <p>
+            Items count:
+            <span data-testid="items-count">0</span>
+        </p>
+
+        <p>
+            First item:
+            <span data-testid="first-item-title">No items</span>
+        </p>
+    </div>
+
+    <script>
+        const loadButton = document.querySelector('[data-testid="load-button"]');
+        const itemsCount = document.querySelector('[data-testid="items-count"]');
+        const firstItemTitle = document.querySelector('[data-testid="first-item-title"]');
+
+        loadButton.addEventListener("click", async () => {
+            try {
+                const response = await fetch("/api/v1/items");
+
+                if (!response.ok) {
+                    throw new Error("Failed to load items");
+                }
+
+                const result = await response.json();
+                const items = result.data;
+
+                itemsCount.textContent = items.length;
+
+                if (items.length > 0) {
+                    firstItemTitle.textContent = items[0].title;
+                } else {
+                    firstItemTitle.textContent = "No items";
+                }
+            } catch (error) {
+                itemsCount.textContent = "0";
+                firstItemTitle.textContent = "No items";
+            }
+        });
+    </script>
+</body>
+</html>
