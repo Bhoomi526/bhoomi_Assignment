@@ -17,7 +17,7 @@ class Source(BaseModel):
 
 
 class ItemCreate(BaseModel):
-    model_config = ConfigDict(strict=True)
+    model_config = ConfigDict(strict=True, extra="forbid",)
 
     title: str
     source: Source
@@ -77,14 +77,21 @@ class ItemUpdate(BaseModel):
     @field_validator("title")
     @classmethod
     def validate_title(cls, value):
-        if not value.strip():
+        if value is None or not value.strip():
             raise ValueError("Title must be a non-empty string")
+        return value
+
+    @field_validator("source")
+    @classmethod
+    def validate_source(cls, value):
+        if value is None:
+            raise ValueError("Source must be provided")
         return value
 
     @field_validator("publishedAt")
     @classmethod
     def validate_published_at(cls, value):
-        if not value.endswith("Z"):
+        if value is None or not value.endswith("Z"):
             raise ValueError("publishedAt must be a UTC datetime ending in Z")
 
         try:
@@ -97,17 +104,13 @@ class ItemUpdate(BaseModel):
     @field_validator("url")
     @classmethod
     def validate_url(cls, value):
-        if not value.strip():
+        if value is None or not value.strip():
             raise ValueError("URL must be a non-empty string")
         return value
 
     @field_validator("tags")
     @classmethod
     def validate_tags(cls, value):
-        if not all(isinstance(tag, str) for tag in value):
+        if value is None or not all(isinstance(tag, str) for tag in value):
             raise ValueError("All tags must be strings")
         return value
-
-
-class Item(ItemCreate):
-    id: str
